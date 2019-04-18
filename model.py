@@ -176,12 +176,12 @@ class convMESH():
         self.z_mean_a, self.z_stddev_a = self.encoder_a(self.inputs_a)
         self.guessed_z_a = self.z_mean_a + self.z_stddev_a * self.random_a
 
-#        self.z_mean_test_a, self.z_stddev_test_a = self.encoder_a(self.inputs_a, train=False)
-#        self.guessed_z_test_a = self.z_mean_test_a + self.z_stddev_test_a * self.random_a
+        self.z_mean_test_a, self.z_stddev_test_a = self.encoder_a(self.inputs_a, train=False)
+        self.guessed_z_test_a = self.z_mean_test_a + self.z_stddev_test_a * self.random_a
 
         self.generated_mesh_train_a = self.decoder_a(self.guessed_z_a, train=True)
         self.generated_mesh_train_a = tf.clip_by_value(self.generated_mesh_train_a, resultmin + 1e-8, resultmax - 1e-8)
-#        self.generated_mesh_test_a = self.decoder_a(self.guessed_z_test_a, train=False)
+        self.generated_mesh_test_a = self.decoder_a(self.guessed_z_test_a, train=False)
 #        self.test_mesh_a = self.decoder_a(self.random_a, train=False)
 
         # reconstruction loss

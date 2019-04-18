@@ -2,14 +2,14 @@
 
 import pickle,random,os,time
 import model as vcgan
-import scipy.io as sio
-import tensorflow as tf
+#import scipy.io as sio
+#import tensorflow as tf
 
 #from utils import *
-from test_utils import *
+#from test_utils import *
 import numpy as np
 import utils
-
+import test_utils
 
 def train_VAE(_model):
 #    Ilf = np.zeros((_model.batch_size, 1))
@@ -80,8 +80,8 @@ def train_VAE(_model):
 
         if (step + 1) % 1000 == 0:
             print(vcgan.logfolder)
-#            if vcgan.test_vae:
-#                test_vae(_model, step)
+            if vcgan.test_vae:
+                test_utils.test_vae(_model, step)
             _model.saver_vae_a.save(_model.sess, _model.checkpoint_dir_vae_a + '/vae_a.model', global_step=step + 1)
             # self.saver_vae_b.save(self.sess, self.checkpoint_dir_vae_b + '/vae_b.model', global_step=step + 1)
 #            _model.saver_vae_all.save(_model.sess, _model.checkpoint_dir_vae_all + '/vae_all.model', global_step=step + 1)

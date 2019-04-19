@@ -16,10 +16,10 @@ n_epoch_Gan = 10000
 
 hidden_dim = 128
 #batchsize = 128
-batchsize = 4
+batchsize = 16
 
-#dataname_a = 'Features0412'
-dataname_a = 'FeaturesCompact'
+dataname_a = 'Features0412'
+#dataname_a = 'FeaturesCompact'
 #dataname_a = 'cat'
 #dataname_b = 'lion'
 featurefile_a = './'+dataname_a+'.mat'
@@ -27,6 +27,7 @@ featurefile_a = './'+dataname_a+'.mat'
 #lightfeildmat = dataname_a+dataname_b+'lfd.mat'
 
 speed = 0.001
+#speed = 0.0005
 resultmax = 0.95
 resultmin = -0.95
 test_vae = True
@@ -52,13 +53,13 @@ class convMESH():
 
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
-    # config.log_device_placement = True
+#    config.log_device_placement = True
     # config.allow_soft_placement = True
     def __init__(self):
         self.sess = None
         if not os.path.isdir(logfolder):
             os.mkdir(logfolder)
-
+        print('Dataset:%s\n' % dataname_a)
         self.feature_a, self.neighbour1_a, self.degree1_a, self.logrmin_a, self.logrmax_a, self.smin_a, self.smax_a, self.modelnum_a, \
         self.pointnum1_a, self.maxdegree1_a, self.L1_a, self.cotw1_a = utils.load_data(featurefile_a, resultmin, resultmax, useS=useS)
 
@@ -83,7 +84,7 @@ class convMESH():
         self.dataset_name_a = dataname_a
         self.pointnum1_a = self.pointnum1_a
         self.maxdegree1_a = self.maxdegree1_a
-        self.mapping1_col_a = self.mapping1_col_a
+#        self.mapping1_col_a = self.mapping1_col_a
         self.model_num_a = self.modelnum_a
         self.lambda1_a = 10.0
         self.lambda2_a = lambda_2
@@ -122,13 +123,13 @@ class convMESH():
         # ---------------------------------------------------a
         self.nb1_a = tf.constant(self.neighbour1_a, dtype='int32', shape=[self.pointnum1_a, self.maxdegree1_a],
                                  name='a/nb_relation1')
-        self.degrees1_a = tf.constant(self.degree1_a, dtype='float32', shape=[self.pointnum1_a, 1], name='a/degrees1')
+#        self.degrees1_a = tf.constant(self.degree1_a, dtype='float32', shape=[self.pointnum1_a, 1], name='a/degrees1')
 
         self.cw1_a = tf.constant(self.cotw1_a, dtype='float32', shape=[self.pointnum1_a, self.maxdegree1_a, 1],
                                  name='a/cw1')
 
-        self.Laplace1_a = tf.constant(self.L1_a, dtype='float32', shape=[self.pointnum1_a, self.pointnum1_a],
-                                      name='a/L1')
+#        self.Laplace1_a = tf.constant(self.L1_a, dtype='float32', shape=[self.pointnum1_a, self.pointnum1_a],
+#                                      name='a/L1')
 
 
         # self.embedding_inputs = tf.placeholder(tf.float32, [None, self.hidden_dim], name='embedding_inputs')
@@ -876,7 +877,7 @@ class convMESH():
 
     def load(self, checkpoint_dir):
         import re
-        print(" [*] Reading checkpoints...")
+        print(" [*] Reading checkpoints %s..." % checkpoint_dir)
         # checkpoint_dir = os.path.join(checkpoint_dir, self.model_dir, self.model_name)
         if not checkpoint_dir.find(self.VAE) == -1:
 #            saver = self.saver_vae_all
@@ -896,5 +897,5 @@ class convMESH():
             return True, counter
         else:
             print(" [*] Failed to find a checkpoint")
-            return False, 0  # model = convMESH()
+            return False, 0
 

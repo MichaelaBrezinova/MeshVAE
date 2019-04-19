@@ -12,19 +12,20 @@ import utils
 import test_utils
 
 def train_VAE(_model):
-    dataname_a = _model.dataset_name_a
-    featurefile_a = './'+dataname_a+'.mat'
-    resultmax = 0.95
-    resultmin = -0.95
-    useS = True
-    feature_a, neighbour1_a, degree1_a, logrmin_a, logrmax_a, smin_a, smax_a, modelnum_a, \
-        pointnum1_a, maxdegree1_a, L1_a, cotw1_a = utils.load_data(featurefile_a, resultmin, resultmax, useS=useS)
-    self.feature_a, self.neighbour1_a, self.degree1_a, self.logrmin_a, self.logrmax_a, self.smin_a, self.smax_a, self.modelnum_a, \
-        self.pointnum1_a, self.maxdegree1_a, self.L1_a, self.cotw1_a = utils.load_data(featurefile_a, resultmin, resultmax, useS=useS)
+#    dataname_a = _model.dataset_name_a
+#    featurefile_a = './'+dataname_a+'.mat'
+#    resultmax = 0.95
+#    resultmin = -0.95
+#    useS = True
+#    feature_a, neighbour1_a, degree1_a, logrmin_a, logrmax_a, smin_a, smax_a, modelnum_a, \
+#        pointnum1_a, maxdegree1_a, L1_a, cotw1_a = utils.load_data(featurefile_a, resultmin, resultmax, useS=useS)
+#    self.feature_a, self.neighbour1_a, self.degree1_a, self.logrmin_a, self.logrmax_a, self.smin_a, self.smax_a, self.modelnum_a, \
+#        self.pointnum1_a, self.maxdegree1_a, self.L1_a, self.cotw1_a = utils.load_data(featurefile_a, resultmin, resultmax, useS=useS)
         
 #    Ilf = np.zeros((_model.batch_size, 1))
     rng = np.random.RandomState(23456)
 
+#    if False:
     if os.path.isfile("id.dat"):
         id = pickle.load(open('id.dat', 'rb'))
         id.show()
@@ -100,10 +101,11 @@ def train_VAE(_model):
                                          _model.random_a: random_a})
             _model.write.add_summary(s, step)
 
-        if (step + 1) % 1 == 0:
-            print(vcgan.logfolder)
-            if vcgan.test_vae:
-                test_utils.test_vae(_model, step)
+        if (step + 1) % 10 == 0:
+            print('Saving model...\n')
+#            print(vcgan.logfolder)
+#            if vcgan.test_vae:
+#                test_utils.test_vae(_model, step)
             save_path = _model.saver_vae_a.save(_model.sess, _model.checkpoint_dir_vae_a + '/vae_a.model', global_step=step + 1)
             print("Model saved in path: %s" % save_path)
             

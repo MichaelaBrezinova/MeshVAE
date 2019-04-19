@@ -445,6 +445,9 @@ class convMESH():
 
         # -----------------------------------------------------
         self.saver_vae_a = tf.train.Saver(variables_vae_a, max_to_keep=None)
+#        print('Saver has %d variables\n' % len(variables_vae_a))
+#        for v in variables_vae_a:
+#            print(v.shape)
 #        self.saver_vae_b = tf.train.Saver(variables_vae_b, max_to_keep=None)
 #        self.saver_vae_all = tf.train.Saver(variables_vae_all, max_to_keep=None)
         # -----------------------------------------

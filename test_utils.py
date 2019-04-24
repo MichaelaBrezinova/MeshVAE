@@ -171,7 +171,7 @@ def test_vae(_model, step):
 #
 def recons_error_a(_model):
     print('Ready')
-    feature_a = _model.feature_a[0:1,:,:]
+    feature_a = _model.feature_a[0:2,:,:]
     print(feature_a.shape)
 #    mean = _model.z_mean_test_a
 #    recover_mesh = _model.generated_mesh_test_a

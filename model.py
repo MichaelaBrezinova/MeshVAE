@@ -903,3 +903,6 @@ class convMESH():
             print(" [*] Failed to find a checkpoint")
             return False, 0
 
+
+    def load_test(self, model_checkpoint_path):
+        self.saver_vae_a.restore(self.sess, model_checkpoint_path)

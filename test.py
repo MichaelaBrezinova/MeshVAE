@@ -49,7 +49,8 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "9"
 train_model = vcgan.convMESH()
 
 with tf.Session(config=train_model.config) as train_model.sess:
-    train_model.train_pre()
+#    train_model.train_pre()
+    train_model.load_test('VAE_Features0412_16_128/backup/vae_a.model-6520')
 #    train_vae.train_VAE(train_model)
 #    train_metric(train_model)
     test_utils.recons_error_a(train_model)

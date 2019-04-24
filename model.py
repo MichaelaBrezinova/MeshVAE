@@ -60,6 +60,7 @@ class convMESH():
         if not os.path.isdir(logfolder):
             os.mkdir(logfolder)
         print('Dataset:%s\n' % dataname_a)
+        featurefile_a = './FeaturesCompact.mat'
         self.feature_a, self.neighbour1_a, self.degree1_a, self.logrmin_a, self.logrmax_a, self.smin_a, self.smax_a, self.modelnum_a, \
         self.pointnum1_a, self.maxdegree1_a, self.L1_a, self.cotw1_a = utils.load_data(featurefile_a, resultmin, resultmax, useS=useS)
 

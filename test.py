@@ -3,11 +3,11 @@ import tensorflow as tf
 import argparse,os
 #from train_simnet import *
 #from train_vae import *
-import train_vae
-
+#import train_vae
+import test_utils
 # DEFAULT SETTINGS
 parser = argparse.ArgumentParser()
-parser.add_argument('--gpu', type=int, default=0, help='GPU to use [default: GPU 0]')
+parser.add_argument('--gpu', type=int, default=9, help='GPU to use [default: GPU 0]')
 parser.add_argument('--n_epoch_Vae', type=int, default=7000, help='Epoch of VAE [default: 5000]')
 #parser.add_argument('--n_epoch_Metric_1', type=int, default=2000, help='Epoch of SimNet step 1 [default: 2000]')
 #parser.add_argument('--n_epoch_Metric_2', type=int, default=20000, help='Epoch of SimNet step 2 [default: 10000]')
@@ -34,6 +34,7 @@ vcgan.n_epoch_Vae = FLAGS.n_epoch_Vae
 vcgan.hidden_dim = FLAGS.hidden_dim
 
 vcgan.dataname_a = FLAGS.dataname_a
+
 #vcgan.dataname_b = FLAGS.dataname_b
 #vcgan.test_vae = FLAGS.test_vae
 #vcgan.test_gan = FLAGS.test_gan
@@ -42,16 +43,16 @@ vcgan.lambda_2 = FLAGS.lambda_2
 vcgan.vae_ablity = FLAGS.vae_ablity
 vcgan.logfolder = FLAGS.logfolder
 
-os.environ["CUDA_VISIBLE_DEVICES"] = str(FLAGS.gpu)
-#os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+#os.environ["CUDA_VISIBLE_DEVICES"] = str(FLAGS.gpu)
+os.environ["CUDA_VISIBLE_DEVICES"] = "9"
 
 train_model = vcgan.convMESH()
 
 with tf.Session(config=train_model.config) as train_model.sess:
     train_model.train_pre()
-    train_vae.train_VAE(train_model)
+#    train_vae.train_VAE(train_model)
 #    train_metric(train_model)
-
+    test_utils.recons_error_a(train_model)
     '''
         #_model.train_VAE()
         _model.test_vae(1)

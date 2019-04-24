@@ -101,12 +101,14 @@ def train_VAE(_model):
                                          _model.random_a: random_a})
             _model.write.add_summary(s, step)
 
-        if (step + 1) % 10 == 0:
+        if (step + 1) % 5 == 0:
             print('Saving model...\n')
 #            print(vcgan.logfolder)
 #            if vcgan.test_vae:
 #                test_utils.test_vae(_model, step)
-            save_path = _model.saver_vae_a.save(_model.sess, _model.checkpoint_dir_vae_a + '/vae_a.model', global_step=step + 1)
+            save_folder = _model.checkpoint_dir_vae_a + '/%d'%str(step)
+            os.makedirs(save_folder)
+            save_path = _model.saver_vae_a.save(_model.sess, save_folder + '/vae_a.model', global_step=step + 1)
             print("Model saved in path: %s" % save_path)
             
             # self.saver_vae_b.save(self.sess, self.checkpoint_dir_vae_b + '/vae_b.model', global_step=step + 1)

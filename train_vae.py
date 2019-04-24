@@ -11,7 +11,11 @@ import numpy as np
 import utils
 import test_utils
 
+featurefile_a = './'+vcgan.dataname_a+'.mat'
+        
 def train_VAE(_model):
+    feature_a, neighbour1_a, degree1_a, logrmin_a, logrmax_a, smin_a, smax_a, modelnum_a, \
+        pointnum1_a, maxdegree1_a, L1_a, cotw1_a = utils.load_data(featurefile_a, vcgan.resultmin, vcgan.resultmax, useS=vcgan.useS)
 #    dataname_a = _model.dataset_name_a
 #    featurefile_a = './'+dataname_a+'.mat'
 #    resultmax = 0.95
@@ -32,9 +36,9 @@ def train_VAE(_model):
         Ia = id.Ia
 #        Ib = id.Ib
     else:
-        Ia = np.arange(len(_model.feature_a))
+        Ia = np.arange(len(feature_a))
 #        Ib = np.arange(len(_model.feature_b))
-        Ia = random.sample(list(Ia), int(len(_model.feature_a) * (1 - vcgan.vae_ablity)))
+        Ia = random.sample(list(Ia), int(len(feature_a) * (1 - vcgan.vae_ablity)))
 #        Ib = random.sample(list(Ib), int(len(_model.feature_b) * (1 - vcgan.vae_ablity)))
 #        id = Id(Ia, Ib)
         id = utils.Id(Ia)
@@ -53,11 +57,11 @@ def train_VAE(_model):
 #        train each batch
         for i in range(0, len(Ia), _model.batch_size):
             timeserver1 = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-            feature_a = _model.feature_a[Ia[i:i+_model.batch_size]]
-            random_a = utils.gaussian(len(feature_a), _model.hidden_dim)
+            feature = feature_a[Ia[i:i+_model.batch_size]]
+            random_a = utils.gaussian(len(feature), _model.hidden_dim)
             _, cost_generation_a, cost_latent_a, l2_loss_a = _model.sess.run(
                     [_model.train_op_vae_a, _model.neg_loglikelihood_a, _model.KL_divergence_a, _model.r2_a],
-                    feed_dict={_model.inputs_a: feature_a, _model.random_a: random_a})
+                    feed_dict={_model.inputs_a: feature, _model.random_a: random_a})
             print("%s Processed %d|%d" % (timeserver1, i+_model.batch_size, len(Ia)))
         
         timeserver1 = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
@@ -97,7 +101,7 @@ def train_VAE(_model):
 #                                         _model.random_a: random_a,
 #                                         _model.random_b: random_b, _model.lf_dis: Ilf})
             s = _model.sess.run(_model.merge_summary,
-                              feed_dict={_model.inputs_a: feature_a,
+                              feed_dict={_model.inputs_a: feature,
                                          _model.random_a: random_a})
             _model.write.add_summary(s, step)
 
@@ -107,7 +111,9 @@ def train_VAE(_model):
 #            if vcgan.test_vae:
 #                test_utils.test_vae(_model, step)
             save_path = _model.saver_vae_a.save(_model.sess, _model.checkpoint_dir_vae_a + '/vae_a.model', global_step=step + 1)
-            print("Model saved in path: %s" % save_path)
+            print("Model saved in path: %s\n" % save_path)
+            print("Testing the model...\n")
+            test_utils.recons_error_a(_model,step)
             
             # self.saver_vae_b.save(self.sess, self.checkpoint_dir_vae_b + '/vae_b.model', global_step=step + 1)
 #            _model.saver_vae_all.save(_model.sess, _model.checkpoint_dir_vae_all + '/vae_all.model', global_step=step + 1)

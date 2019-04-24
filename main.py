@@ -41,6 +41,7 @@ vcgan.tb = FLAGS.tb
 vcgan.lambda_2 = FLAGS.lambda_2
 vcgan.vae_ablity = FLAGS.vae_ablity
 vcgan.logfolder = FLAGS.logfolder
+vcgan.featurefile_a = './FeaturesCompact.mat' # for faster initialization
 
 os.environ["CUDA_VISIBLE_DEVICES"] = str(FLAGS.gpu)
 #os.environ["CUDA_VISIBLE_DEVICES"] = "0"

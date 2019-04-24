@@ -18,7 +18,7 @@ hidden_dim = 128
 #batchsize = 128
 batchsize = 16
 
-dataname_a = 'Features0412'
+dataname_a = ''
 #dataname_a = 'FeaturesCompact'
 #dataname_a = 'cat'
 #dataname_b = 'lion'
@@ -36,7 +36,7 @@ useS = True
 tb = False
 lambda_2 = 10.0
 vae_ablity = 0.0
-layer = 2
+layer = 5
 sp = False
 timecurrent = time.strftime('%Y%m%d_%H%M%S', time.localtime(time.time()))
 logfolder = './' + timecurrent + 'test'
@@ -59,10 +59,9 @@ class convMESH():
         self.sess = None
         if not os.path.isdir(logfolder):
             os.mkdir(logfolder)
-        print('Dataset:%s\n' % dataname_a)
-        featurefile_a = './FeaturesCompact.mat'
-        self.feature_a, self.neighbour1_a, self.degree1_a, self.logrmin_a, self.logrmax_a, self.smin_a, self.smax_a, self.modelnum_a, \
-        self.pointnum1_a, self.maxdegree1_a, self.L1_a, self.cotw1_a = utils.load_data(featurefile_a, resultmin, resultmax, useS=useS)
+        print('Dataset:%s\n' % dataname_a)        
+        feature_a, neighbour1_a, self.degree1_a, self.logrmin_a, self.logrmax_a, self.smin_a, self.smax_a, self.modelnum_a, \
+        self.pointnum1_a, self.maxdegree1_a, L1_a, cotw1_a = utils.load_data(featurefile_a, resultmin, resultmax, useS=useS)
 
 #        self.feature_b, self.neighbour1_b, self.degree1_b, self.logrmin_b, self.logrmax_b, self.smin_b, self.smax_b, self.modelnum_b, \
 #        self.pointnum1_b, self.maxdegree1_b, \
@@ -122,11 +121,11 @@ class convMESH():
         # >>>>>>>>>>>>>>>>>>>
         # 
         # ---------------------------------------------------a
-        self.nb1_a = tf.constant(self.neighbour1_a, dtype='int32', shape=[self.pointnum1_a, self.maxdegree1_a],
+        self.nb1_a = tf.constant(neighbour1_a, dtype='int32', shape=[self.pointnum1_a, self.maxdegree1_a],
                                  name='a/nb_relation1')
 #        self.degrees1_a = tf.constant(self.degree1_a, dtype='float32', shape=[self.pointnum1_a, 1], name='a/degrees1')
 
-        self.cw1_a = tf.constant(self.cotw1_a, dtype='float32', shape=[self.pointnum1_a, self.maxdegree1_a, 1],
+        self.cw1_a = tf.constant(cotw1_a, dtype='float32', shape=[self.pointnum1_a, self.maxdegree1_a, 1],
                                  name='a/cw1')
 
 #        self.Laplace1_a = tf.constant(self.L1_a, dtype='float32', shape=[self.pointnum1_a, self.pointnum1_a],

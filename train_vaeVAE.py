@@ -11,7 +11,7 @@ import numpy as np
 import utils
 import test_utils
 
-featurefile_a = '.mat'
+featurefile_a = './'+vcgan.dataname_a+'.mat'
         
 def train_VAE(_model):
     feature_a, neighbour1_a, degree1_a, logrmin_a, logrmax_a, smin_a, smax_a, modelnum_a, \
@@ -59,19 +59,14 @@ def train_VAE(_model):
             timeserver1 = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
             feature = feature_a[Ia[i:i+_model.batch_size]]
             random_a = utils.gaussian(len(feature), _model.hidden_dim)
-#            _, cost_generation_a, cost_latent_a, l2_loss_a = _model.sess.run(
-#                    [_model.train_op_vae_a, _model.neg_loglikelihood_a, _model.KL_divergence_a, _model.r2_a],
-#                    feed_dict={_model.inputs_a: feature, _model.random_a: random_a})
-            _, cost_generation_a, l2_loss_a = _model.sess.run(
-                    [_model.train_op_vae_a, _model.neg_loglikelihood_a, _model.r2_a],
+            _, cost_generation_a, cost_latent_a, l2_loss_a = _model.sess.run(
+                    [_model.train_op_vae_a, _model.neg_loglikelihood_a, _model.KL_divergence_a, _model.r2_a],
                     feed_dict={_model.inputs_a: feature, _model.random_a: random_a})
-            print("%s Processed %d|%d cost_generation_a: %.8f, l2_loss_a: %.8f" % (timeserver1, i+_model.batch_size, len(Ia),cost_generation_a, l2_loss_a))
+            print("%s Processed %d|%d" % (timeserver1, i+_model.batch_size, len(Ia)))
         
         timeserver1 = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-#        print("|%s step: [%2d|%d]cost_generation_a: %.8f, cost_latent_a: %.8f, l2_loss_a: %.8f" % (
-#                timeserver1, step + 1, vcgan.n_epoch_Vae, cost_generation_a, cost_latent_a, l2_loss_a))
-        print("|%s step: [%2d|%d]cost_generation_a: %.8f, l2_loss_a: %.8f" % (
-                timeserver1, step + 1, vcgan.n_epoch_Vae, cost_generation_a, l2_loss_a))
+        print("|%s step: [%2d|%d]cost_generation_a: %.8f, cost_latent_a: %.8f, l2_loss_a: %.8f" % (
+                timeserver1, step + 1, vcgan.n_epoch_Vae, cost_generation_a, cost_latent_a, l2_loss_a))
         
 #        feature_a = _model.feature_a[Ia]
 ##        feature_b = _model.feature_b[Ib]
@@ -91,15 +86,13 @@ def train_VAE(_model):
 ##        print("|%s step: [%2d|%d]cost_generation_b: %.8f, cost_latent_b: %.8f, l2_loss_b: %.8f" % (
 ##            timeserver1, step + 1, vcgan.n_epoch_Vae, cost_generation_b, cost_latent_b, l2_loss_b))
 
-#        _model.file.write("|%s Epoch: [%5d|%d] cost_generation_a: %.8f, cost_latent_a: %.8f, l2_loss_a: %.8f\n" \
-#                        % (timeserver1, step + 1, vcgan.n_epoch_Vae, cost_generation_a, cost_latent_a, l2_loss_a))
-        _model.file.write("|%s Epoch: [%5d|%d] cost_generation_a: %.8f, l2_loss_a: %.8f\n" \
-                        % (timeserver1, step + 1, vcgan.n_epoch_Vae, cost_generation_a, l2_loss_a))
+        _model.file.write("|%s Epoch: [%5d|%d] cost_generation_a: %.8f, cost_latent_a: %.8f, l2_loss_a: %.8f\n" \
+                        % (timeserver1, step + 1, vcgan.n_epoch_Vae, cost_generation_a, cost_latent_a, l2_loss_a))
 
 #        _model.file.write("|%s Epoch: [%5d|%d] cost_generation_b: %.8f, cost_latent_b: %.8f, l2_loss_b: %.8f\n" \
 #                        % (timeserver1, step + 1, vcgan.n_epoch_Vae, cost_generation_b, cost_latent_b, l2_loss_b))
 
-#        _model.file_vae.write("A %d %.8f %.8f %.8f\n" % (step + 1, cost_generation_a, cost_latent_a, l2_loss_a))
+        _model.file_vae.write("A %d %.8f %.8f %.8f\n" % (step + 1, cost_generation_a, cost_latent_a, l2_loss_a))
 #        _model.file_vae.write("B %d %.8f %.8f %.8f\n" % (step + 1, cost_generation_b, cost_latent_b, l2_loss_b))
 
         if vcgan.tb and (step + 1) % 20 == 0:
@@ -112,7 +105,7 @@ def train_VAE(_model):
                                          _model.random_a: random_a})
             _model.write.add_summary(s, step)
 
-        if (step + 1) % 10 == 0:
+        if (step + 1) % 20 == 0:
             print('Saving model...\n')
 #            print(vcgan.logfolder)
 #            if vcgan.test_vae:
@@ -120,7 +113,7 @@ def train_VAE(_model):
             save_path = _model.saver_vae_a.save(_model.sess, _model.checkpoint_dir_vae_a + '/vae_a.model', global_step=step + 1)
             print("Model saved in path: %s\n" % save_path)
             print("Testing the model...\n")
-            test_utils.recons_error_a(_model,step,feature_a)
+            test_utils.recons_error_a(_model,step)
             
             # self.saver_vae_b.save(self.sess, self.checkpoint_dir_vae_b + '/vae_b.model', global_step=step + 1)
 #            _model.saver_vae_all.save(_model.sess, _model.checkpoint_dir_vae_all + '/vae_all.model', global_step=step + 1)

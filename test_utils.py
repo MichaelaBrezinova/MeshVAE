@@ -169,9 +169,9 @@ def test_vae(_model, step):
 #    f.close()
 #
 #
-def recons_error_a(_model,step):
+def recons_error_a(_model,step,features):
     print('Ready')
-    feature_a = _model.feature_a[0:1,:,:]
+    feature_a = features[0:1,:,:]
 #    print(feature_a.shape)
 #    mean = _model.z_mean_test_a
 #    recover_mesh = _model.generated_mesh_test_a
@@ -197,7 +197,33 @@ def recons_error_a(_model,step):
     f.close()
     print('done')
 
+def recons_error(_model,features):
+    print('Ready')
+    feature_a = features[0:1,:,:]
+#    print(feature_a.shape)
+#    mean = _model.z_mean_test_a
+#    recover_mesh = _model.generated_mesh_test_a
+    zeros1 = np.zeros((len(feature_a), vcgan.hidden_dim)).astype('float32')
+    mean, recover_mesh = _model.sess.run([_model.z_mean_test_a, _model.generated_mesh_test_a],
+                                       feed_dict={_model.inputs_a: feature_a, _model.random_a: zeros1})
+#    print('Done')
+#    print(mean.shape)
+#    print(recover_mesh.shape)
+    feature1 = np.concatenate((feature_a, recover_mesh), axis=0)
+#    print(feature1.shape)
+    fv1 = utils.recover_data(feature1, _model.logrmin_a, _model.logrmax_a, _model.smin_a, _model.smax_a, vcgan.resultmin, vcgan.resultmax,
+                       useS=vcgan.useS)
+#    print(fv1.shape)
+    if not os.path.isdir(vcgan.logfolder + '/_recon'):
+        os.mkdir(vcgan.logfolder + '/_recon')
+    name = vcgan.logfolder + '/_recon/' + 'recover_a.h5'
 
+    f = h5py.File(name, 'w')
+    f['test_mesh'] = fv1 # this contains input_mesh (idx 0) and recovered mesh
+    f['latent_z'] = mean
+#    f['input_mesh'] = feature_a
+    f.close()
+    print('done')
 #def recons_error_b(_model):
 #    zeros1 = np.zeros((_model.model_num_b, vcgan.hidden_dim)).astype('float32')
 #    mean, recover_mesh = _model.sess.run([_model.z_mean_test_b, _model.generated_mesh_test_b],

@@ -5,6 +5,8 @@ import argparse,os
 #from train_vae import *
 #import train_vae
 import test_utils
+import utils
+
 # DEFAULT SETTINGS
 parser = argparse.ArgumentParser()
 parser.add_argument('--gpu', type=int, default=9, help='GPU to use [default: GPU 0]')
@@ -14,8 +16,8 @@ parser.add_argument('--n_epoch_Vae', type=int, default=7000, help='Epoch of VAE 
 #parser.add_argument('--n_epoch_Gan', type=int, default=10000, help='Epoch of Cycle Gan [default: 10000]')
 parser.add_argument('--hidden_dim', type=int, default=128, help='latent space dimension [Default: 128]')
 #parser.add_argument('--dataname_a', type=str, default='cat', help='data set A name [Default: cat]')
-#parser.add_argument('--dataname_a', type=str, default='Features0412', help='data set A name [Default: cat]')
-parser.add_argument('--dataname_a', type=str, default='FeaturesCompact', help='data set A name [Default: cat]')
+parser.add_argument('--dataname_a', type=str, default='Features0412', help='data set A name [Default: cat]')
+#parser.add_argument('--dataname_a', type=str, default='FeaturesCompact', help='data set A name [Default: cat]')
 #parser.add_argument('--dataname_b', type=str, default='lion', help='data set B name [Default: lion]')
 #parser.add_argument('--test_vae', type=bool, default=True, help='Output vae test file [Default: true]')
 #parser.add_argument('--test_gan', type=bool, default=True, help='Output Sim Net test file [Default: true]')
@@ -42,18 +44,21 @@ vcgan.tb = FLAGS.tb
 vcgan.lambda_2 = FLAGS.lambda_2
 vcgan.vae_ablity = FLAGS.vae_ablity
 vcgan.logfolder = FLAGS.logfolder
-
-#os.environ["CUDA_VISIBLE_DEVICES"] = str(FLAGS.gpu)
-os.environ["CUDA_VISIBLE_DEVICES"] = "9"
+vcgan.featurefile_a = './Features0412.mat' # for faster initialization
+os.environ["CUDA_VISIBLE_DEVICES"] = str(FLAGS.gpu)
+#os.environ["CUDA_VISIBLE_DEVICES"] = "9"
 
 train_model = vcgan.convMESH()
 
+feature_a, neighbour1_a, degree1_a, logrmin_a, logrmax_a, smin_a, smax_a, modelnum_a, \
+        pointnum1_a, maxdegree1_a, L1_a, cotw1_a = utils.load_data(vcgan.featurefile_a, vcgan.resultmin, vcgan.resultmax, useS=vcgan.useS)
+        
 with tf.Session(config=train_model.config) as train_model.sess:
 #    train_model.train_pre()
-    train_model.load_test('VAE_Features0412_16_128/backup/vae_a.model-6520')
+    train_model.load_test('VAE_Features0412_16_128/vae_a.model-200')
 #    train_vae.train_VAE(train_model)
 #    train_metric(train_model)
-    test_utils.recons_error_a(train_model)
+    test_utils.recons_error(train_model,feature_a)
     '''
         #_model.train_VAE()
         _model.test_vae(1)

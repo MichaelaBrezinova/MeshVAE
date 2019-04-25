@@ -26,17 +26,17 @@ featurefile_a = './'+dataname_a+'.mat'
 #featurefile_b = './'+dataname_b+'.mat'
 #lightfeildmat = dataname_a+dataname_b+'lfd.mat'
 
-#speed = 0.001
-speed = 0.00001
+speed = 0.001
+#speed = 0.0005
 resultmax = 0.95
 resultmin = -0.95
 test_vae = True
 test_gan = True
 useS = True
 tb = False
-lambda_2 = 0.0
+lambda_2 = 10.0
 vae_ablity = 0.0
-layer = 2
+layer = 5
 sp = False
 timecurrent = time.strftime('%Y%m%d_%H%M%S', time.localtime(time.time()))
 logfolder = './' + timecurrent + 'test'
@@ -87,7 +87,7 @@ class convMESH():
 #        self.mapping1_col_a = self.mapping1_col_a
         self.model_num_a = self.modelnum_a
         self.lambda1_a = 10.0
-        self.lambda2_a = 1.0 #lambda_2
+        self.lambda2_a = lambda_2
 
 #        self.dataset_name_b = dataname_b
 #        self.pointnum1_b = self.pointnum1_b
@@ -150,18 +150,12 @@ class convMESH():
         if layer >= 5:
             self.vae_n5_a, self.vae_e5_a = utils.get_conv_weights(self.vertex_dim, self.finaldim, name='encoder/a/convw5')
             print("layer|%d" % (layer))
-#        self.vae_meanpara_a = tf.get_variable("encoder/a/mean_weights",
-#                                              [self.pointnum1_a * self.finaldim, self.hidden_dim],
-#                                              tf.float32, tf.random_normal_initializer(stddev=0.02))
-#        self.vae_stdpara_a = tf.get_variable("encoder/a/std_weights",
-#                                             [self.pointnum1_a * self.finaldim, self.hidden_dim],
-#                                             tf.float32, tf.random_normal_initializer(stddev=0.02))
         self.vae_meanpara_a = tf.get_variable("encoder/a/mean_weights",
                                               [self.pointnum1_a * self.finaldim, self.hidden_dim],
-                                              tf.float32, initializer=tf.contrib.layers.xavier_initializer())
+                                              tf.float32, tf.random_normal_initializer(stddev=0.02))
         self.vae_stdpara_a = tf.get_variable("encoder/a/std_weights",
                                              [self.pointnum1_a * self.finaldim, self.hidden_dim],
-                                             tf.float32, initializer=tf.contrib.layers.xavier_initializer())
+                                             tf.float32, tf.random_normal_initializer(stddev=0.02))
         # self.vae_mean_dpara_a = tf.get_variable("decoder/a/mean_weights",
         #                                      [self.pointnum2_a * self.finaldim, self.hidden_dim],
         #                                      tf.float32, tf.random_normal_initializer(stddev=0.02))
@@ -194,46 +188,33 @@ class convMESH():
         # reconstruction loss
         marginal_likelihood_a = tf.reduce_sum(tf.pow(self.inputs_a - self.generated_mesh_train_a, 2.0),
                                               [1, 2])  # + tf.abs(self.z_mean)
-#        KL_divergence_a = 0.5 * tf.reduce_sum(
-#            tf.square(self.z_mean_a) + tf.square(self.z_stddev_a / self.object_stddev_a) - tf.log(
-#                1e-8 + tf.square(self.z_stddev_a / self.object_stddev_a)) - 1, 1)
-#
+        KL_divergence_a = 0.5 * tf.reduce_sum(
+            tf.square(self.z_mean_a) + tf.square(self.z_stddev_a / self.object_stddev_a) - tf.log(
+                1e-8 + tf.square(self.z_stddev_a / self.object_stddev_a)) - 1, 1)
+
         self.neg_loglikelihood_a = self.lambda2_a * tf.reduce_mean(marginal_likelihood_a)
-#        self.KL_divergence_a = self.lambda1_a * tf.reduce_mean(KL_divergence_a)
-#
-#        ELBO_a = - self.neg_loglikelihood_a - self.KL_divergence_a
-        ELBO_a = - self.neg_loglikelihood_a # try use only MSE loss
+        self.KL_divergence_a = self.lambda1_a * tf.reduce_mean(KL_divergence_a)
+
+        ELBO_a = - self.neg_loglikelihood_a - self.KL_divergence_a
         if layer >= 1:
-#            tf.clip_by_value(self.vae_e1_a, 1e-8, 2.0 - 1e-8);
-#            tf.clip_by_value(self.vae_n1_a, 1e-8, 2.0 - 1e-8);
             self.r2_a = tf.nn.l2_loss(self.vae_e1_a) + tf.nn.l2_loss(self.vae_n1_a)
             print("layer|%d" % (layer))
         if layer >= 2:
-#            tf.clip_by_value(self.vae_e2_a, 1e-8, 2.0 - 1e-8);
-#            tf.clip_by_value(self.vae_n2_a, 1e-8, 2.0 - 1e-8);
             self.r2_a = self.r2_a + tf.nn.l2_loss(self.vae_e2_a) + tf.nn.l2_loss(self.vae_n2_a)
             print("layer|%d" % (layer))
         if layer >= 3:
-#            tf.clip_by_value(self.vae_e3_a, 1e-8, 2.0 - 1e-8);
-#            tf.clip_by_value(self.vae_n3_a, 1e-8, 2.0 - 1e-8);
             self.r2_a = self.r2_a + tf.nn.l2_loss(self.vae_e3_a) + tf.nn.l2_loss(self.vae_n3_a)
             print("layer|%d" % (layer))
         if layer >= 4:
-#            tf.clip_by_value(self.vae_e4_a, 1e-8, 2.0 - 1e-8);
-#            tf.clip_by_value(self.vae_n4_a, 1e-8, 2.0 - 1e-8);
             self.r2_a = self.r2_a + tf.nn.l2_loss(self.vae_e4_a) + tf.nn.l2_loss(self.vae_n4_a)
             print("layer|%d" % (layer))
         if layer >= 5:
-#            tf.clip_by_value(self.vae_e5_a, 1e-8, 2.0 - 1e-8);
-#            tf.clip_by_value(self.vae_n5_a, 1e-8, 2.0 - 1e-8);
             self.r2_a = self.r2_a + tf.nn.l2_loss(self.vae_e5_a) + tf.nn.l2_loss(self.vae_n5_a)
             print("layer|%d" % (layer))
 
         # self.r2_a = tf.nn.l2_loss(self.vae_e1_a) + tf.nn.l2_loss(self.vae_n1_a) + \
         #            tf.nn.l2_loss(self.vae_e2_a) + tf.nn.l2_loss(self.vae_n2_a) + \
         #            tf.nn.l2_loss(self.vae_e3_a) + tf.nn.l2_loss(self.vae_n3_a) + \
-#        tf.clip_by_value(self.vae_stdpara_a, 1e-8, 2.0 - 1e-8);
-#        tf.clip_by_value(self.vae_meanpara_a, 1e-8, 2.0 - 1e-8);
         self.r2_a = self.r2_a + tf.nn.l2_loss(self.vae_stdpara_a) + tf.nn.l2_loss(
             self.vae_meanpara_a)  # + tf.nn.l2_loss(self.vae_mean_dpara_a)
         # self.r2_a = tf.losses.get_regularization_loss(scope='encoder/a') + tf.losses.get_regularization_loss(scope='decoder/a')
@@ -383,8 +364,8 @@ class convMESH():
 #        tf.summary.scalar('loss_vae_b', self.loss_vae_b)
         # ------------------------------------------
 
-#        tf.summary.scalar("nll_a", self.neg_loglikelihood_a)
-#        tf.summary.scalar("kl_a", self.KL_divergence_a)
+        tf.summary.scalar("nll_a", self.neg_loglikelihood_a)
+        tf.summary.scalar("kl_a", self.KL_divergence_a)
         tf.summary.scalar("L2_loss_a", self.r2_a)
 #        tf.summary.scalar("nll_b", self.neg_loglikelihood_b)
 #        tf.summary.scalar("kl_b", self.KL_divergence_b)

@@ -82,10 +82,14 @@ def newconvlayer_pooling(input_feature, input_dim, output_dim, nb_weights, edge_
 def get_conv_weights(input_dim, output_dim, name='convweight'):
     with tf.variable_scope(name) as scope:
         scope.set_regularizer(tf.contrib.layers.l2_regularizer(scale=1.0))
+#        n = tf.get_variable("nb_weights", [input_dim, output_dim], tf.float32,
+#                            tf.random_normal_initializer(stddev=0.02))
+#        e = tf.get_variable("edge_weights", [input_dim, output_dim], tf.float32,
+#                            tf.random_normal_initializer(stddev=0.02))
         n = tf.get_variable("nb_weights", [input_dim, output_dim], tf.float32,
-                            tf.random_normal_initializer(stddev=0.02))
+                            initializer=tf.contrib.layers.xavier_initializer())
         e = tf.get_variable("edge_weights", [input_dim, output_dim], tf.float32,
-                            tf.random_normal_initializer(stddev=0.02))
+                            initializer=tf.contrib.layers.xavier_initializer())        
         return n, e
 
 

@@ -7,7 +7,7 @@ import train_vae
 
 # DEFAULT SETTINGS
 parser = argparse.ArgumentParser()
-parser.add_argument('--gpu', type=int, default=0, help='GPU to use [default: GPU 0]')
+parser.add_argument('--gpu', type=int, default=9, help='GPU to use [default: GPU 0]')
 parser.add_argument('--n_epoch_Vae', type=int, default=7000, help='Epoch of VAE [default: 5000]')
 #parser.add_argument('--n_epoch_Metric_1', type=int, default=2000, help='Epoch of SimNet step 1 [default: 2000]')
 #parser.add_argument('--n_epoch_Metric_2', type=int, default=20000, help='Epoch of SimNet step 2 [default: 10000]')
@@ -50,6 +50,7 @@ train_model = vcgan.convMESH()
 
 with tf.Session(config=train_model.config) as train_model.sess:
     train_model.train_pre()
+    train_vae.featurefile_a = './' + FLAGS.dataname_a + '.mat'
     train_vae.train_VAE(train_model)
 #    train_metric(train_model)
 
